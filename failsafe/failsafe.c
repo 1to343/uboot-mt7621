@@ -18,6 +18,7 @@ static u32 upload_data_id;
 static const void *upload_data;
 static size_t upload_size;
 static int upgrade_success;
+static u32 flashing_start_time;
 
 extern int write_firmware_failsafe(size_t data_addr, uint32_t data_size);
 
@@ -190,9 +191,11 @@ static void result_handler(enum httpd_uri_handler_status status,
 			return;
 		}
 
-		if (upload_data_id == upload_id)
+		if (upload_data_id == upload_id) {
+            flashing_start_time = get_timer(0);
 			st->ret = write_firmware_failsafe((size_t) upload_data,
 				upload_size);
+        }
 
 		/* invalidate upload identifier */
 		upload_data_id = rand();
@@ -249,6 +252,25 @@ static void not_found_handler(enum httpd_uri_handler_status status,
 		output_plain_file(response, "404.html");
 		response->info.code = 404;
 	}
+}
+
+static void progress_handler(enum httpd_uri_handler_status status, 
+                             struct httpd_request *request,
+                             struct httpd_response *response) {
+  if (status == HTTP_CB_NEW) {
+    u32 current_time = get_timer(0);
+    u32 elapsed_time = current_time - flashing_start_time;
+    int progress = 0;
+
+    progress = (elapsed_time * 100) / (upload_size / 1024);
+
+    response->data = (char *)malloc(16);
+    sprintf(response->data, "%d", progress);
+    response->size = strlen(response->data);
+    response->info.code = 200;
+    response->info.connection_close = 1;
+    response->info.content_type = "text/plain";
+  }
 }
 
 int start_web_failsafe(void)
