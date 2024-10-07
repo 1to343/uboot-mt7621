@@ -11,22 +11,22 @@
 	<div id="main">
 		<p>Upgrading is in progressing, please wait ...</p>
 		<p>This page may be in not responding status for a short time.</p>
+        <progress id="progress-bar" value="0" max="100"></progress> <div id="progress-text">0%</div>  </div>
 	</div>
 	<script type="text/javascript">
 		var interval = window.setInterval(function () {
-			var xmlhttp = new XMLHttpRequest();
-
-			window.clearInterval(interval);
-
-			xmlhttp.timeout = 300000;
-			xmlhttp.open("GET", "/result", true);
-			xmlhttp.send();
-			xmlhttp.onreadystatechange = function () {
-				if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-					document.getElementById("main").innerHTML = xmlhttp.responseText;
-				}
-			}
-		}, 1000);
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.timeout = 300000;
+            xmlhttp.open("GET", "/progress", true); // Запрос к /progress
+            xmlhttp.send();
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    var progress = parseInt(xmlhttp.responseText);
+                    document.getElementById("progress-bar").value = progress;
+                    document.getElementById("progress-text").innerText = progress + "%"; 
+                }
+            }
+        }, 1000);
 	</script>
 </body>
 </html>
