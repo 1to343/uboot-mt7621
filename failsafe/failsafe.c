@@ -294,6 +294,7 @@ int start_web_failsafe(void)
 	httpd_register_uri_handler(inst, "/result", &result_handler, NULL);
 	httpd_register_uri_handler(inst, "/style.css", &style_handler, NULL);
 	httpd_register_uri_handler(inst, "", &not_found_handler, NULL);
+        httpd_register_uri_handler(inst, "/progress", &progress_handler, NULL);
 
 	net_loop(TCP);
 
