@@ -119,6 +119,7 @@ static void upload_handler(enum httpd_uri_handler_status status,
 		upload_data_id = upload_id;
 		upload_data = fw->data;
 		upload_size = fw->size;
+		flashing_start_time = get_timer(0);
 
 		return;
 	}
